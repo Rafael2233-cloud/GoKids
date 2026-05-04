@@ -78,21 +78,42 @@
     @endpush
     @push('scripts')
         <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
         <script>
-            // Set content to hidden input on form submit
+            // 2. Inisialisasi Editor Quill (Pastikan tidak ada kurung yang tertinggal)
+            const quill = new Quill('#quill-editor', {
+                theme: 'snow',
+                placeholder: 'Tulis konten artikel di sini...',
+                modules: {
+                    toolbar: [
+                        [{
+                            'header': [1, 2, 3, false]
+                        }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{
+                            'list': 'ordered'
+                        }, {
+                            'list': 'bullet'
+                        }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                }
+            });
+
+            // 3. Sinkronisasi data ke hidden input saat form di-submit
             const formArtikel = document.getElementById('form-artikel');
 
             if (formArtikel) {
                 formArtikel.addEventListener('submit', function() {
-                    // Ambil teks murni dari Quill (tanpa tag HTML) lalu hilangkan spasi kosong
+                    // Ambil teks murni
                     const plainText = quill.getText().trim();
                     const contentInput = document.getElementById('content-input');
 
-                    // Jika benar-benar kosong, biarkan input value kosong agar divalidasi Laravel
+                    // Cek apakah benar-benar kosong
                     if (plainText.length === 0) {
                         contentInput.value = '';
                     } else {
-                        // Jika ada isinya, masukkan kode HTML lengkap dari Quill
                         contentInput.value = quill.root.innerHTML;
                     }
                 });

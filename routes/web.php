@@ -27,6 +27,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/profil', [UserProfileController::class, 'index'])->name('profil');
     Route::post('/profil/update', [UserProfileController::class, 'update'])->name('profil.update');
     Route::post('/profil/password', [UserProfileController::class, 'updatePassword'])->name('profil.password');
+
+    // Tambahkan di dalam group route yang sudah melewati middleware auth
+    Route::post('/children/{child}/vaccinations', [ChildController::class, 'storeVaccination'])->name('vaccinations.store');
 });
 
 // Admin routes
@@ -41,10 +44,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::delete('/artikel/{artikel}', [ArticleController::class, 'destroy'])->name('admin.artikel.destroy');
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('admin.laporan');
-
+    Route::get('/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.pdf');
     Route::get('/profil', [AdminProfileController::class, 'index'])->name('admin.profil');
     Route::post('/profil/update', [AdminProfileController::class, 'update'])->name('admin.profil.update');
     Route::post('/profil/password', [AdminProfileController::class, 'updatePassword'])->name('admin.profil.password');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -78,6 +78,27 @@ class ChildController extends Controller
         return redirect('/input')->with('success', 'Data pertumbuhan berhasil disimpan!');
     }
 
+    public function storeVaccination(Request $request, Child $child)
+    {
+        // Pastikan hanya orang tua pemilik anak ini yang bisa input
+        $this->authorizeChild($child);
+
+        $request->validate([
+            'vaccine_name' => 'required|string|max:255',
+            'scheduled_date' => 'required|date',
+            'status' => 'required|in:upcoming,done', // Sesuaikan dengan DB-mu
+        ]);
+
+        // Simpan data vaksinasi menggunakan relasi
+        $child->vaccinations()->create([
+            'vaccine_name' => $request->vaccine_name,
+            'scheduled_date' => $request->scheduled_date,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Data vaksinasi berhasil disimpan!');
+    }
+
     private function authorizeChild(Child $child)
     {
         if ($child->user_id !== Auth::id()) {
