@@ -1,253 +1,134 @@
 @extends('layouts.user')
+
 @section('content')
-    {{-- Tambahkan showVaccineModal pada x-data --}}
-    <div class="space-y-8" x-data="{ activeTab: 'register', showGrowthModal: false, showVaccineModal: false, selectedChild: null }">
-        <h1 class="text-2xl font-bold text-primary">Input Data Anak</h1>
-
-        <div class="flex gap-2">
-            <button @click="activeTab = 'register'"
-                :class="activeTab === 'register' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm">
-                ➕ Registrasi Anak Baru
-            </button>
-            <button @click="activeTab = 'list'"
-                :class="activeTab === 'list' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
-                class="px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm">
-                📋 Daftar Anak & Pertumbuhan
-            </button>
-        </div>
-
-        <div x-show="activeTab === 'register'" x-cloak>
-            <div class="bg-white rounded-xl shadow-md p-6 max-w-lg">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Registrasi Anak Baru</h2>
-                <form action="{{ route('child.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Anak</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent focus:border-transparent"
-                            placeholder="Masukkan nama anak">
-                        @error('name')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
-                        <input type="date" name="birth_date" value="{{ old('birth_date') }}" required
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent focus:border-transparent">
-                        @error('birth_date')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
-                        <div class="flex gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="gender" value="L"
-                                    {{ old('gender') === 'L' ? 'checked' : '' }} required
-                                    class="text-accent focus:ring-accent">
-                                <span class="text-sm">👦 Laki-laki</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="gender" value="P"
-                                    {{ old('gender') === 'P' ? 'checked' : '' }} class="text-accent focus:ring-accent">
-                                <span class="text-sm">👧 Perempuan</span>
-                            </label>
-                        </div>
-                        @error('gender')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Foto Anak</label>
-                        <input type="file" name="photo" accept="image/*"
-                            class="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-accent/10 file:text-accent hover:file:bg-accent/20">
-                        @error('photo')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <button type="submit"
-                        class="px-6 py-2.5 bg-primary text-white rounded-full font-medium text-sm hover:bg-primary-600 transition shadow-md">
-                        Simpan Data Anak
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div x-show="activeTab === 'list'" x-cloak>
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50 border-b">
-                            <tr>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600">No</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Nama</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Tgl Lahir</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Jenis Kelamin</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Usia</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-600">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @forelse($children as $index => $child)
-                                <tr class="hover:bg-gray-50 transition">
-                                    <td class="px-4 py-3 text-gray-600">{{ $index + 1 }}</td>
-                                    <td class="px-4 py-3 font-medium text-gray-800">{{ $child->name }}</td>
-                                    <td class="px-4 py-3 text-gray-600">
-                                        {{ \Carbon\Carbon::parse($child->birth_date)->format('d/m/Y') }}</td>
-                                    <td class="px-4 py-3">
-                                        <span
-                                            class="px-2 py-1 rounded-full text-xs font-medium {{ $child->gender === 'L' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700' }}">
-                                            {{ $child->gender === 'L' ? 'Laki-laki' : 'Perempuan' }}
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-gray-600">
-                                        {{ \Carbon\Carbon::parse($child->birth_date)->diff(\Carbon\Carbon::now())->format('%y tahun %m bulan') }}
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        <div class="flex gap-2">
-                                            <a href="{{ route('child.show', $child) }}"
-                                                class="px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-medium hover:bg-accent/90 transition">Detail</a>
-
-                                            {{-- Tombol Pertumbuhan --}}
-                                            <button @click="showGrowthModal = true; selectedChild = {{ $child->id }}"
-                                                class="px-3 py-1.5 bg-secondary text-white rounded-lg text-xs font-medium hover:bg-secondary/90 transition">Input
-                                                Pertumbuhan</button>
-
-                                            {{-- TOMBOL BARU: Input Vaksin --}}
-                                            <button @click="showVaccineModal = true; selectedChild = {{ $child->id }}"
-                                                class="px-3 py-1.5 bg-purple-500 text-white rounded-lg text-xs font-medium hover:bg-purple-600 transition shadow-sm">
-                                                Input Vaksin
-                                            </button>
-
-                                            <form action="{{ route('child.destroy', $child) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus data anak ini?')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit"
-                                                    class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-medium hover:bg-red-600 transition">Hapus</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">Belum ada data anak.
-                                        Silakan registrasi anak baru.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div x-show="showGrowthModal" x-cloak
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            @click.self="showGrowthModal = false">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4" @click.stop>
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Input Data Pertumbuhan</h3>
-                    <button @click="showGrowthModal = false" class="text-gray-400 hover:text-gray-600 transition">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <form :action="'/input/' + selectedChild + '/growth'" method="POST" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Berat Badan (kg)</label>
-                        <input type="number" name="weight" step="0.01" min="0.1" required
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent focus:border-transparent"
-                            placeholder="Contoh: 12.5">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tinggi Badan (cm)</label>
-                        <input type="number" name="height" step="0.1" min="1" required
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent focus:border-transparent"
-                            placeholder="Contoh: 85.0">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Lingkar Kepala (cm)</label>
-                        <input type="number" name="head_circumference" step="0.1" min="1"
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent focus:border-transparent"
-                            placeholder="Contoh: 46.0">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Pengukuran</label>
-                        <input type="date" name="recorded_at" required
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
-                        <textarea name="notes" rows="2"
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent focus:border-transparent resize-none"
-                            placeholder="Catatan tambahan (opsional)"></textarea>
-                    </div>
-                    <button type="submit"
-                        class="w-full py-2.5 bg-primary text-white rounded-full font-medium text-sm hover:bg-primary-600 transition shadow-md">
-                        Simpan Data Pertumbuhan
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div x-show="showVaccineModal" x-cloak
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            @click.self="showVaccineModal = false">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4" @click.stop>
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800">Input Jadwal Vaksinasi</h3>
-                    <button @click="showVaccineModal = false" class="text-gray-400 hover:text-gray-600 transition">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                {{-- Letakkan ini di dalam div Modal, tepat sebelum tag <form> --}}
-                @if ($errors->any())
-                    <div class="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-xs font-medium">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>• {{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                {{-- Pastikan action URL ini sesuai dengan rute web.php kamu --}}
-                <form :action="'/children/' + selectedChild + '/vaccinations'" method="POST" class="space-y-4">
-                    @csrf
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Vaksin</label>
-                        <input type="text" name="vaccine_name" required
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                            placeholder="Contoh: DPT 1, Polio, Campak">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Dijadwalkan</label>
-                        <input type="date" name="scheduled_date" required
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                        <select name="status"
-                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white">
-                            {{-- GANTI value-nya agar sesuai dengan aturan Controller (upcoming & done) --}}
-                            <option value="upcoming">Upcoming (Menunggu)</option>
-                            <option value="done">Done (Selesai)</option>
-                        </select>
-                    </div>
-
-                    <button type="submit"
-                        class="w-full py-2.5 bg-purple-600 text-white rounded-full font-medium text-sm hover:bg-purple-700 transition shadow-md">
-                        Simpan Jadwal Vaksin
-                    </button>
-                </form>
-            </div>
-        </div>
-
+<div class="max-w-4xl mx-auto space-y-6 pb-10" x-data="{ selectedChild: null, showAddModal: false, showGrowthModal: false, showVaccineModal: false, showEditModal: false, selectedChildData: {} }">
+    
+    {{-- Header --}}
+    <div class="flex items-center gap-4">
+        <a href="{{ route('dashboard') }}" class="p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 hover:text-blue-600 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <h1 class="text-2xl font-bold text-blue-900">Input Data Tumbuh Kembang</h1>
     </div>
+
+    {{-- Pemilihan Anak --}}
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Pilih profil anak:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {{-- Card Anak --}}
+            @forelse($children as $child)
+            <div @click="selectedChild = {{ $child->id }}" 
+                 :class="selectedChild === {{ $child->id }} ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-100' : 'border-gray-100 bg-gray-50'"
+                 class="p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-lg">
+                    {{ $child->gender === 'L' ? '👦' : '👧' }}
+                </div>
+                <div class="flex-1">
+                    <p class="font-bold text-gray-800 text-sm">{{ $child->name }}</p>
+                    <p class="text-[10px] text-gray-500">{{ $child->age }}</p>
+                </div>
+                <div x-show="selectedChild === {{ $child->id }}" class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                </div>
+            </div>
+            @empty
+            @endforelse
+            
+            {{-- Tombol Tambah Anak --}}
+            <div @click="showAddModal = true" class="p-4 rounded-2xl border-2 border-dashed border-gray-200 hover:border-blue-400 transition-colors cursor-pointer flex items-center justify-center gap-2 text-blue-600 font-bold text-sm">
+                <span>+</span> Tambah Anak Baru
+            </div>
+        </div>
+    </div>
+
+    {{-- Form Input (shown when child selected) --}}
+    <template x-if="selectedChild">
+        <div>
+            {{-- Tanggal --}}
+            <div class="md:col-span-3 bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                <label class="text-xs font-bold text-gray-400 uppercase block mb-2">Tanggal Pengukuran</label>
+                <input type="date" class="w-full bg-gray-50 border-none rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500" value="{{ date('Y-m-d') }}">
+            </div>
+
+            {{-- Berat, Tinggi, L.Kepala --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-2">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Berat Badan (kg)</label>
+                    <input type="number" step="0.1" class="text-3xl font-bold w-full border-none focus:ring-0 p-0" placeholder="0.0" x-model="weight">
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-2">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Tinggi Badan (cm)</label>
+                    <input type="number" step="0.1" class="text-3xl font-bold w-full border-none focus:ring-0 p-0" placeholder="0.0" x-model="height">
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-2">
+                    <label class="text-xs font-bold text-gray-400 uppercase">Lingkar Kepala (cm)</label>
+                    <input type="number" step="0.1" class="text-3xl font-bold w-full border-none focus:ring-0 p-0" placeholder="0.0" x-model="head">
+                </div>
+            </div>
+
+            {{-- Tombol Simpan --}}
+            <form :action="`{{ url('/input') }}/${selectedChild}/growth`" method="POST" class="mt-4">
+                @csrf
+                <input type="hidden" name="weight" x-model="weight">
+                <input type="hidden" name="height" x-model="height">
+                <input type="hidden" name="head_circumference" x-model="head">
+                <input type="hidden" name="recorded_at" value="{{ date('Y-m-d') }}">
+                <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg transition-all transform hover:-translate-y-1">
+                    Simpan Data Tumbuh Kembang
+                </button>
+            </form>
+        </div>
+    </template>
+
+    {{-- Quick Action Buttons --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <button @click="showAddModal = true" class="flex items-center justify-center gap-2 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:border-blue-400 transition">
+            <span class="text-2xl">➕</span>
+            <span class="font-bold text-gray-700">Registrasi Anak Baru</span>
+        </button>
+        <a href="{{ route('input') }}" class="flex items-center justify-center gap-2 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:border-blue-400 transition">
+            <span class="text-2xl">📋</span>
+            <span class="font-bold text-gray-700">Lihat Semua Data</span>
+        </a>
+    </div>
+
+    {{-- Add Child Modal --}}
+    <div x-show="showAddModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" @click.self="showAddModal = false">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" @click.stop>
+            <div class="flex items-center justify-between p-5 border-b border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-900">Registrasi Anak Baru</h3>
+                <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form action="{{ route('child.store') }}" method="POST" enctype="multipart/form-data" class="p-5 space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Anak</label>
+                    <input type="text" name="name" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Tanggal Lahir</label>
+                    <input type="date" name="birth_date" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-accent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
+                    <div class="flex gap-4">
+                        <label class="flex-1 flex items-center justify-center gap-2 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent/5">
+                            <input type="radio" name="gender" value="L" required class="text-accent"> 👦 Laki-laki
+                        </label>
+                        <label class="flex-1 flex items-center justify-center gap-2 p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent/5">
+                            <input type="radio" name="gender" value="P" class="text-accent"> 👧 Perempuan
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Foto (opsional)</label>
+                    <input type="file" name="photo" accept="image/*" class="w-full text-sm">
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-primary-600">Simpan</button>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection

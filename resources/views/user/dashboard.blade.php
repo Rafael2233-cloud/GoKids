@@ -1,348 +1,158 @@
 @extends('layouts.user')
+
 @section('content')
-    <div class="max-w-7xl mx-auto space-y-10">
-
-        {{-- 1. Greeting Header --}}
+<div class="max-w-7xl mx-auto space-y-8 pb-10">
+    
+    {{-- 1. Dashboard Header --}}
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-blue-900 uppercase tracking-tight">SELAMAT DATANG
-                {{ strtoupper($user->name ?? 'Orang Tua') }}!</h1>
-            <p class="text-gray-500 mt-2 text-sm md:text-base">Temukan solusi dari permasalahan tumbuh kembang anak</p>
+            <h1 class="text-2xl font-bold text-blue-900">Dashboard Orang Tua</h1>
+            <p class="text-gray-500 text-sm mt-1">Selamat datang kembali! Pantau tumbuh kembang anak Anda dengan mudah.</p>
         </div>
+        <div class="bg-blue-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm w-fit">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <span class="text-sm font-semibold">{{ \Carbon\Carbon::now()->translatedFormat('d M Y') }}</span>
+        </div>
+    </div>
 
-        {{-- 2. Article Section (Info & Tips Kesehatan) --}}
-        <div class="w-full">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-gray-900">Info & Tips Kesehatan</h2>
-                <a href="javascript:void(0)" id="btn-lihat-banyak"
-                    class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 transition">
-                    Lihat lebih banyak
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
+    {{-- 2. Stats Summary Cards --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-5">
+            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
             </div>
-
-            {{-- Initial 3 Article Cards --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="article-grid-initial">
-                @forelse($latestArticles ?? [] as $article)
-                    @php
-                        $cat = strtolower($article->category ?? 'lainnya');
-                        $topBg = 'bg-gray-100';
-                        $badgeBg = 'bg-gray-500';
-                        if ($cat === 'kesehatan') {
-                            $topBg = 'bg-pink-100';
-                            $badgeBg = 'bg-red-500';
-                        } elseif ($cat === 'makanan') {
-                            $topBg = 'bg-orange-100';
-                            $badgeBg = 'bg-orange-500';
-                        } elseif ($cat === 'edukasi') {
-                            $topBg = 'bg-blue-100';
-                            $badgeBg = 'bg-blue-500';
-                        }
-                    @endphp
-                    <div
-                        class="bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow overflow-hidden">
-                        <div
-                            class="h-40 w-full relative {{ $topBg }} flex items-center justify-center overflow-hidden">
-                            @if (isset($article->thumbnail) && $article->thumbnail)
-                                <img src="{{ asset('storage/' . $article->thumbnail) }}" alt="{{ $article->title }}"
-                                    class="w-full h-full object-cover">
-                            @else
-                                <span class="text-4xl opacity-50">📰</span>
-                            @endif
-                            <span
-                                class="absolute top-4 left-4 inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full text-white shadow-sm {{ $badgeBg }}">
-                                {{ $article->category ?? 'Artikel' }}
-                            </span>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <h3 class="font-bold text-base text-gray-900 leading-snug line-clamp-2 mb-2">
-                                {{ $article->title ?? 'Judul Artikel' }}</h3>
-                            <p class="text-xs text-gray-400 mb-3">
-                                {{ isset($article->published_at) ? $article->published_at->format('M d') : (isset($article->created_at) ? $article->created_at->format('M d') : '') }}
-                            </p>
-                            <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed flex-1">
-                                {{ Str::limit(strip_tags($article->content ?? ''), 70) }}</p>
-                            <a href="{{ route('artikel.show', $article->id ?? 1) }}"
-                                class="text-red-500 text-sm font-bold mt-4 hover:text-red-600 transition flex items-center gap-1 w-fit">
-                                Baca Selengkapnya <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                @empty
-                    <div
-                        class="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-3xl shadow-sm border border-gray-100 p-10 text-center">
-                        <span class="text-5xl mb-4 block">📰</span>
-                        <h2 class="text-lg font-bold text-gray-800 mb-2">Belum Ada Artikel</h2>
-                        <p class="text-gray-500 text-sm">Artikel Info & Tips Kesehatan akan muncul di sini.</p>
-                    </div>
-                @endforelse
-            </div>
-
-            {{-- All Articles (hidden by default) --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 hidden" id="article-grid-all">
-                @foreach (($allArticles ?? collect())->skip(3) as $article)
-                    @php
-                        $cat = strtolower($article->category ?? 'lainnya');
-                        $topBg = 'bg-gray-100';
-                        $badgeBg = 'bg-gray-500';
-                        if ($cat === 'kesehatan') {
-                            $topBg = 'bg-pink-100';
-                            $badgeBg = 'bg-red-500';
-                        } elseif ($cat === 'makanan') {
-                            $topBg = 'bg-orange-100';
-                            $badgeBg = 'bg-orange-500';
-                        } elseif ($cat === 'edukasi') {
-                            $topBg = 'bg-blue-100';
-                            $badgeBg = 'bg-blue-500';
-                        }
-                    @endphp
-                    <div
-                        class="bg-white rounded-3xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow overflow-hidden">
-                        <div
-                            class="h-40 w-full relative {{ $topBg }} flex items-center justify-center overflow-hidden">
-                            @if (isset($article->thumbnail) && $article->thumbnail)
-                                <img src="{{ asset('storage/' . $article->thumbnail) }}" alt="{{ $article->title }}"
-                                    class="w-full h-full object-cover">
-                            @else
-                                <span class="text-4xl opacity-50">📰</span>
-                            @endif
-                            <span
-                                class="absolute top-4 left-4 inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full text-white shadow-sm {{ $badgeBg }}">
-                                {{ $article->category ?? 'Artikel' }}
-                            </span>
-                        </div>
-                        <div class="p-6 flex-1 flex flex-col">
-                            <h3 class="font-bold text-base text-gray-900 leading-snug line-clamp-2 mb-2">
-                                {{ $article->title ?? 'Judul Artikel' }}</h3>
-                            <p class="text-xs text-gray-400 mb-3">
-                                {{ isset($article->published_at) ? $article->published_at->format('M d') : (isset($article->created_at) ? $article->created_at->format('M d') : '') }}
-                            </p>
-                            <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed flex-1">
-                                {{ Str::limit(strip_tags($article->content ?? ''), 70) }}</p>
-                            <a href="{{ route('artikel.show', $article->id ?? 1) }}"
-                                class="text-red-500 text-sm font-bold mt-4 hover:text-red-600 transition flex items-center gap-1 w-fit">
-                                Baca Selengkapnya <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Total Anak</p>
+                <p class="text-2xl font-bold text-gray-800">{{ $childCount ?? 0 }}</p>
             </div>
         </div>
-
-        {{-- 3 & 4. Info Tumbuh Kembang, Vaksinasi & Tata Cara --}}
-        <div class="flex flex-col lg:flex-row gap-8 items-start w-full">
-
-            {{-- KIRI: Tumbuh Kembang & Card Biru Vaksinasi --}}
-            <div class="flex-1 min-w-0 w-full flex flex-col gap-8">
-
-                {{-- Info Tumbuh Kembang --}}
-                <div class="w-full">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold text-gray-900">Info Tumbuh Kembang</h2>
-                        <a href="#"
-                            class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 transition">
-                            Lihat Semua Milestone
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </a>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                        {{-- Card Motoric --}}
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
-                            <div
-                                class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-5">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z" />
-                                </svg>
-                            </div>
-                            <h3 class="font-bold text-gray-900 text-lg mb-2">Motorik</h3>
-                            <p class="text-sm text-gray-500 leading-relaxed flex-1 mb-6">Anak sudah bisa berjalan stabil dan
-                                mulai berlari dengan keseimbangan yang lebih baik.</p>
-                            <div>
-                                <a href="#"
-                                    class="inline-block px-5 py-2 bg-green-400 text-white text-xs font-bold rounded-full hover:bg-green-500 transition shadow-sm uppercase tracking-wider">BACA
-                                    SELENGKAPNYA</a>
-                            </div>
-                        </div>
-
-                        {{-- Card Cognitive --}}
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
-                            <div
-                                class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-5">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-                                </svg>
-                            </div>
-                            <h3 class="font-bold text-gray-900 text-lg mb-2">Kognitif</h3>
-                            <p class="text-sm text-gray-500 leading-relaxed flex-1 mb-6">Menyusun bentuk dan mengenali warna
-                                primer jadi fokus utama untuk usia ini.</p>
-                            <div>
-                                <a href="#"
-                                    class="inline-block px-5 py-2 bg-green-400 text-white text-xs font-bold rounded-full hover:bg-green-500 transition shadow-sm uppercase tracking-wider">BACA
-                                    SELENGKAPNYA</a>
-                            </div>
-                        </div>
-
-                        {{-- Card Social --}}
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
-                            <div
-                                class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-5">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-                                </svg>
-                            </div>
-                            <h3 class="font-bold text-gray-900 text-lg mb-2">Sosial</h3>
-                            <p class="text-sm text-gray-500 leading-relaxed flex-1 mb-6">Mulai menunjukkan empati dan
-                                bermain peran (make-believe) dengan pendamping.</p>
-                            <div>
-                                <span
-                                    class="inline-block px-5 py-2 bg-green-400 text-white text-xs font-bold rounded-full shadow-sm uppercase tracking-wider">SESUAI
-                                    TARGET</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Upcoming Vaccination --}}
-                @if (isset($upcomingVaccinations) && $upcomingVaccinations->count() > 0)
-                    @php $firstVacc = $upcomingVaccinations->first(); @endphp
-                    <div class="bg-blue-600 rounded-3xl p-8 text-white shadow-md relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h2 class="text-2xl font-bold mb-3 tracking-wide">Jadwal Vaksinasi Berikutnya</h2>
-                            <p class="text-sm text-white/90 leading-relaxed mb-6 max-w-md">
-                                Vaksin {{ $firstVacc->vaccine_name ?? 'booster DTaP' }} untuk
-                                {{ $firstVacc->child->name ?? 'anak' }} dijadwalkan dalam
-                                {{ $firstVacc->scheduled_date ? $firstVacc->scheduled_date->diffForHumans(null, true) : '15 hari' }}.
-                                Segera jadwalkan kunjungan ke klinik anak terdekat.
-                            </p>
-                            <a href="#"
-                                class="inline-block bg-white text-blue-600 text-sm font-extrabold px-8 py-3 rounded-xl hover:bg-gray-50 transition shadow-sm w-fit">
-                                Ingatkan Nanti
-                            </a>
-                        </div>
-                    </div>
-                @else
-                    {{-- Dummy Data jika tidak ada jadwal vaksin untuk testing layout --}}
-                    <div class="bg-[#1a73e8] rounded-3xl p-8 text-white shadow-md relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h2 class="text-2xl font-bold mb-3 tracking-wide">Jadwal Vaksinasi Berikutnya</h2>
-                            <p class="text-sm text-white/90 leading-relaxed mb-6 max-w-md">
-                                Vaksin booster DTaP dijadwalkan dalam 15 hari. Segera jadwalkan kunjungan ke klinik anak
-                                terdekat.
-                            </p>
-                            <a href="#"
-                                class="inline-block bg-white text-blue-600 text-sm font-extrabold px-8 py-3 rounded-xl hover:bg-gray-50 transition shadow-sm w-fit">
-                                Ingatkan Nanti
-                            </a>
-                        </div>
-                    </div>
-                @endif
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-5">
+            <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4h2v4zm0-6h-2V7h2v3z"/></svg>
             </div>
-
-            {{-- KANAN: Tata Cara Pengukuran --}}
-            <div class="w-full lg:w-80 flex-shrink-0">
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 h-full flex flex-col">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div
-                            class="w-12 h-12 flex-shrink-0 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                            </svg>
-                        </div>
-                        <h3 class="font-bold text-gray-900 text-lg leading-tight">Tata Cara<br>Pengukuran</h3>
-                    </div>
-
-                    <div class="flex-1">
-                        {{-- Measuring Weight --}}
-                        <h4 class="text-xs font-extrabold text-blue-600 uppercase tracking-widest mb-5">MENGUKUR BERAT
-                            BADAN</h4>
-                        <div class="space-y-6 mb-10">
-                            <div class="flex items-start gap-4">
-                                <span
-                                    class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">1</span>
-                                <p class="text-sm text-gray-600 leading-relaxed mt-0.5">Gunakan timbangan digital di
-                                    permukaan yang rata dan keras.</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <span
-                                    class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">2</span>
-                                <p class="text-sm text-gray-600 leading-relaxed mt-0.5">Lepaskan pakaian tebal dan sepatu
-                                    sebelum menimbang.</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <span
-                                    class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">3</span>
-                                <p class="text-sm text-gray-600 leading-relaxed mt-0.5">Pastikan anak berdiri santai dan
-                                    diam di tengah timbangan.</p>
-                            </div>
-                        </div>
-
-                        {{-- Measuring Height --}}
-                        <h4 class="text-xs font-extrabold text-blue-600 uppercase tracking-widest mb-5">MENGUKUR TINGGI
-                            BADAN</h4>
-                        <div class="space-y-6">
-                            <div class="flex items-start gap-4">
-                                <span
-                                    class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">1</span>
-                                <p class="text-sm text-gray-600 leading-relaxed mt-0.5">Berdiri menyandar pada dinding rata
-                                    tanpa alas lantai (baseboard).</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <span
-                                    class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">2</span>
-                                <p class="text-sm text-gray-600 leading-relaxed mt-0.5">Posisikan agar tumit, bahu,
-                                    punggung, dan belakang kepala menyentuh dinding.</p>
-                            </div>
-                            <div class="flex items-start gap-4">
-                                <span
-                                    class="w-7 h-7 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">3</span>
-                                <p class="text-sm text-gray-600 leading-relaxed mt-0.5">Gunakan benda datar (seperti buku)
-                                    untuk menandai ujung tertinggi kepala.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Pemeriksaan Bulan Ini</p>
+                <p class="text-2xl font-bold text-gray-800">{{ $checkupsThisMonth ?? 0 }}</p>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-5">
+            <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.19 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55z"/></svg>
+            </div>
+            <div>
+                <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider">Artikel Dibaca</p>
+                <p class="text-2xl font-bold text-gray-800">0</p>
             </div>
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            const btnLihat = document.getElementById('btn-lihat-banyak');
-            const gridAll = document.getElementById('article-grid-all');
+    {{-- 3. Ringkasan Anak Section --}}
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                Ringkasan Anak
+            </h2>
+            <a href="{{ route('input') }}" class="text-sm font-semibold text-blue-600 hover:bg-blue-50 px-4 py-1.5 rounded-lg transition">Lihat Detail ></a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @forelse($children as $child)
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 relative overflow-hidden group">
+                @php
+                    $status = $child->nutritional_status;
+                    $statusClass = match($status) {
+                        'Normal' => 'bg-green-100 text-green-600',
+                        'Stunting' => 'bg-red-100 text-red-600',
+                        'Obesitas' => 'bg-orange-100 text-orange-600',
+                        default => 'bg-gray-100 text-gray-500'
+                    };
+                @endphp
+                <span class="absolute top-4 right-4 {{ $statusClass }} text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">{{ $status ?? 'Belum Ada Data' }}</span>
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center border border-gray-100">
+                        <span class="text-2xl">{{ $child->gender === 'L' ? '👦' : '👧' }}</span>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800">{{ $child->name }}</h3>
+                        <p class="text-xs text-gray-500">{{ $child->age }}</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-dashed border-gray-100 flex items-center justify-between text-gray-400">
+                    <div class="flex items-center gap-1.5 text-[11px]">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Pemeriksaan terakhir: {{ $child->last_checkup ?? 'Belum pernah' }}
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-3 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center text-gray-500 italic">
+                Belum ada data anak. Klik "Input Data" untuk memulai.
+            </div>
+            @endforelse
+        </div>
+    </div>
 
-            if (btnLihat && gridAll) {
-                btnLihat.addEventListener('click', function() {
-                    if (gridAll.classList.contains('hidden')) {
-                        gridAll.classList.remove('hidden');
-                        btnLihat.innerHTML =
-                            'Lihat lebih sedikit <svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
-                        gridAll.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    } else {
-                        gridAll.classList.add('hidden');
-                        btnLihat.innerHTML =
-                            'Lihat lebih banyak <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>';
-                    }
-                });
-            }
-        </script>
-    @endpush
+    {{-- 4. Artikel Section --}}
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2zM14 4v4h4"/></svg>
+                Artikel Tumbuh Kembang Anak
+            </h2>
+            <a href="#" class="text-sm font-semibold text-gray-400 hover:text-blue-600 transition">Lihat Semua ↗</a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @forelse($latestArticles as $article)
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-50 overflow-hidden flex flex-col hover:shadow-md transition">
+                <div class="relative h-48">
+                    @if($article->thumbnail)
+                        <img src="{{ asset('storage/' . $article->thumbnail) }}" class="w-full h-full object-cover">
+                    @else
+                        <div class="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                            <span class="text-6xl">📰</span>
+                        </div>
+                    @endif
+                    <span class="absolute top-4 right-4 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase">{{ $article->category }}</span>
+                </div>
+                <div class="p-6 space-y-3">
+                    <h3 class="font-bold text-gray-900 leading-snug">{{ $article->title }}</h3>
+                    <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                        {{ Str::limit(strip_tags($article->content), 100) }}
+                    </p>
+                    <div class="flex items-center justify-between pt-2">
+                        <div class="flex items-center gap-1.5 text-gray-400 text-[11px]">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {{ $article->published_at ? $article->published_at->translatedFormat('d M Y') : '' }}
+                        </div>
+                        <a href="{{ route('artikel.show', $article->id) }}" class="text-blue-600 text-xs font-bold hover:underline">Baca ></a>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-2 text-center py-8 text-gray-500">
+                <span class="text-4xl mb-2 block">📰</span>
+                <p>Belum ada artikel tersedia</p>
+            </div>
+            @endforelse
+        </div>
+    </div>
+
+    {{-- 5. Tips Hari Ini (Highlight Card) --}}
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-8 text-white relative overflow-hidden shadow-lg">
+        <div class="relative z-10 max-w-2xl space-y-4">
+            <div class="flex items-center gap-2">
+                <span class="p-2 bg-white/20 rounded-lg">✨</span>
+                <h2 class="text-xl font-bold">Tips Hari Ini</h2>
+            </div>
+            <blockquote class="text-lg font-medium leading-relaxed italic">
+                "Berikan anak variasi makanan berwarna-warni setiap hari untuk memastikan asupan nutrisi yang lengkap dan seimbang."
+            </blockquote>
+            <p class="text-sm text-blue-100 font-semibold">- Dr. Sarah Pediatrician, Spesialis Anak</p>
+        </div>
+        <div class="absolute right-[-20px] bottom-[-20px] opacity-10">
+            <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+    </div>
+
+</div>
 @endsection

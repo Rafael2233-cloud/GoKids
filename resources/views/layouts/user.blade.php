@@ -46,18 +46,18 @@
 
             <!-- Nav -->
             <nav class="flex-1 px-3 py-4 space-y-1">
-                <a href="/dashboard"
-                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->is('dashboard') ? 'active' : '' }}">
+                <a href="{{ route('dashboard') }}"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <span class="text-lg">📊</span>
                     <span>Dashboard</span>
                 </a>
-                <a href="/input"
-                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->is('input*') ? 'active' : '' }}">
+                <a href="{{ route('input') }}"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('input*') ? 'active' : '' }}">
                     <span class="text-lg">➕</span>
                     <span>Input</span>
                 </a>
-                <a href="/profil"
-                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->is('profil*') ? 'active' : '' }}">
+                <a href="{{ route('profil') }}"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('profil*') ? 'active' : '' }}">
                     <span class="text-lg">👤</span>
                     <span>Profil</span>
                 </a>

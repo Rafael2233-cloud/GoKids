@@ -54,4 +54,46 @@ class Child extends Model
     {
         return $this->hasOne(GrowthRecord::class)->latestOfMany('recorded_at');
     }
+
+    public function milestones()
+    {
+        return $this->hasMany(Milestone::class);
+    }
+
+    public function getNutritionalStatusAttribute(): ?string
+    {
+        $latest = $this->latestGrowth;
+        if (!$latest) return null;
+
+        $heightM = $latest->height / 100;
+        if ($heightM <= 0) return null;
+
+        $bmi = $latest->weight / ($heightM * $heightM);
+        $ageInMonths = $this->birth_date->diffInMonths(Carbon::now());
+
+        // Simplified WHO standards for BMI-for-age
+        if ($ageInMonths < 60) { // Under 5 years
+            if ($bmi < 14) return 'Stunting';
+            if ($bmi > 18) return 'Obesitas';
+            return 'Normal';
+        } else { // 5 years and above
+            if ($bmi < 14) return 'Stunting';
+            if ($bmi > 22) return 'Obesitas';
+            return 'Normal';
+        }
+    }
+
+    public function getBmiAttribute(): ?float
+    {
+        $latest = $this->latestGrowth;
+        if (!$latest || $latest->height <= 0) return null;
+        return round($latest->weight / (($latest->height / 100) ** 2), 1);
+    }
+
+    public function getLastCheckupAttribute(): ?string
+    {
+        $latest = $this->latestGrowth;
+        if (!$latest) return null;
+        return $latest->recorded_at->diffForHumans(null, true);
+    }
 }

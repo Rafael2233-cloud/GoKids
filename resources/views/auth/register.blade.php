@@ -18,17 +18,9 @@
         <div class="bg-white rounded-2xl shadow-lg p-8">
             <!-- Logo -->
             <div class="text-center mb-6">
-                <!-- Logo -->
-                <div class="text-center mb-8">
-                    <!-- Gambar dibikin lebih gede (w-20 h-20) dan ke tengah (mx-auto) -->
-                    <img src="{{ asset('images/GoKids.jpeg') }}" alt="Logo GoKids"
-                        class="w-20 h-20 mx-auto rounded-full object-cover mb-4 shadow-sm ring-4 ring-gray-50">
-
-                    <h1 class="text-3xl font-bold text-gray-800 tracking-tight">GoKids</h1>
-                    <p class="text-gray-500 text-sm mt-2 leading-relaxed">Welcome back! Monitor your child's growth and
-                        health journey with ease.</p>
-                </div>
-                <h1 class="text-3xl font-bold text-gray-800">GoKids</h1>
+                <img src="{{ asset('images/GoKids.jpeg') }}" alt="Logo GoKids"
+                    class="w-20 h-20 mx-auto rounded-full object-cover mb-4 shadow-sm ring-4 ring-gray-50">
+                <h1 class="text-3xl font-bold text-gray-800 tracking-tight">GoKids</h1>
                 <p class="text-gray-500 text-sm mt-2 leading-relaxed">Daftar sekarang untuk mulai memantau tumbuh
                     kembang anak Anda.</p>
             </div>

@@ -5,22 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vaccination extends Model
+class Milestone extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'child_id',
-        'vaccine_name',
-        'scheduled_date',
-        'actual_date',
-        'status',
+        'category',
+        'milestone_name',
+        'description',
+        'is_achieved',
+        'achieved_at',
         'notes',
     ];
 
     protected $casts = [
-        'scheduled_date' => 'date',
-        'actual_date' => 'date',
+        'is_achieved' => 'boolean',
+        'achieved_at' => 'date',
     ];
 
     public function child()

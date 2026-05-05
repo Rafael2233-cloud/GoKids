@@ -37,7 +37,7 @@ class UserProfileController extends Controller
 
         $user->update($data);
 
-        return redirect('/profil')->with('success', 'Profil berhasil diperbarui!');
+        return redirect()->route('profil')->with('success', 'Profil berhasil diperbarui!');
     }
 
     public function updatePassword(Request $request)
@@ -50,6 +50,6 @@ class UserProfileController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect('/profil')->with('success', 'Password berhasil diubah!');
+        return redirect()->route('profil')->with('success', 'Password berhasil diubah!');
     }
 }

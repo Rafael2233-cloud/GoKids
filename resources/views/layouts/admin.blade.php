@@ -46,23 +46,23 @@
 
             <!-- Nav -->
             <nav class="flex-1 px-3 py-4 space-y-1">
-                <a href="/admin/dashboard"
-                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                <a href="{{ route('admin.dashboard') }}"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <span class="text-lg">📊</span>
                     <span>Dashboard</span>
                 </a>
-                <a href="/admin/artikel"
-                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->is('admin/artikel*') ? 'active' : '' }}">
+                <a href="{{ route('admin.artikel.index') }}"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('admin.artikel*') ? 'active' : '' }}">
                     <span class="text-lg">📝</span>
                     <span>Artikel</span>
                 </a>
-                <a href="/admin/laporan"
-                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->is('admin/laporan*') ? 'active' : '' }}">
+                <a href="{{ route('admin.laporan') }}"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
                     <span class="text-lg">📋</span>
                     <span>Laporan</span>
                 </a>
-                <a href="/admin/profil"
-                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->is('admin/profil*') ? 'active' : '' }}">
+                <a href="{{ route('admin.profil') }}"
+                    class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium {{ request()->routeIs('admin.profil*') ? 'active' : '' }}">
                     <span class="text-lg">👤</span>
                     <span>Profil</span>
                 </a>

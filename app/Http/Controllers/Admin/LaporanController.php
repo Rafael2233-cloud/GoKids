@@ -34,10 +34,10 @@ class LaporanController extends Controller
 
         $records = $query->orderBy('recorded_at', 'desc')->paginate(15);
 
-        // Statistics
+        // Statistics - calculate from filtered query, not entire table
         $totalRecords = $query->count();
-        $avgWeight = GrowthRecord::avg('weight');
-        $avgHeight = GrowthRecord::avg('height');
+        $avgWeight = $query->clone()->avg('weight');
+        $avgHeight = $query->clone()->avg('height');
 
         $children = Child::with('user')->get();
 

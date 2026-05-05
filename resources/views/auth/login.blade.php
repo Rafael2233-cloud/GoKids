@@ -102,7 +102,7 @@
                             class="rounded border-gray-300 text-accent focus:ring-accent">
                         <span class="text-sm text-gray-600">Remember me</span>
                     </label>
-                    <a href="#" class="text-sm text-accent hover:underline font-medium">Forgot password?</a>
+                    <a href="{{ route('password.request') }}" class="text-sm text-accent hover:underline font-medium">Forgot password?</a>
                 </div>
 
                 <!-- Login Button -->
