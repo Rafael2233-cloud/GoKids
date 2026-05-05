@@ -9,7 +9,7 @@
 
     <!-- Recent Users -->
     <div>
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Pengguna Terbaru</h2>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Pengguna-Terbaru</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             @forelse($recentUsers as $u)
             <div class="bg-white rounded-xl shadow-md p-4 text-center">
